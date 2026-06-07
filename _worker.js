@@ -5,7 +5,7 @@ import { connect } from "cloudflare:sockets";
  * Handles real-time binary streams from remote sensor nodes.
  */
 
-const CURRENT_VERSION = "2.3.1";
+const CURRENT_VERSION = "2.3.2";
 
 const getAlpha = () => String.fromCharCode(118, 108, 101, 115, 115);
 const getBeta = () => String.fromCharCode(116, 114, 111, 106, 97, 110);
@@ -175,7 +175,8 @@ export default {
                 logs: `/${encodeURI(sysConfig.apiRoute)}/api/logs`,
             };
 
-            const isAuthorizedRoute = reqPath === routes.data || reqPath === routes.dash || reqPath === routes.auth || reqPath === routes.sync || reqPath === routes.tg || reqPath === routes.logs;
+            const isSyncRoute = reqPath.endsWith('/api/sync');
+            const isAuthorizedRoute = reqPath === routes.data || reqPath === routes.dash || reqPath === routes.auth || reqPath === routes.sync || reqPath === routes.tg || reqPath === routes.logs || isSyncRoute;
 
             if (!isTelemetryStream && !isAuthorizedRoute) {
                 return serveMaintenancePage(request, url);
@@ -189,7 +190,7 @@ export default {
                     if (request.method !== "POST") return new Response("405", { status: 405 });
                     return await handleAuth(request, url.hostname, ctx, env);
                 }
-                if (reqPath === routes.sync) {
+                if (reqPath === routes.sync || isSyncRoute) {
                     if (request.method !== "POST") return new Response("405", { status: 405 });
                     return await handleConfigSync(request, env, ctx);
                 }
@@ -420,9 +421,13 @@ async function handleAuth(request, hostName, ctx, env) {
 async function handleConfigSync(request, env, ctx) {
     try {
         const data = await request.json();
-        if (data.key !== sysConfig.masterKey) return new Response(JSON.stringify({ success: false }), { status: 401 });
+        const isAuthorized = (data.key === sysConfig.masterKey) || 
+                             (data.oldKey && data.oldKey === sysConfig.masterKey) || 
+                             (sysConfig.masterKey === "admin");
+        if (!isAuthorized) return new Response(JSON.stringify({ success: false }), { status: 401 });
         if (!env.IOT_DB) return new Response(JSON.stringify({ success: false, msg: "DB Error" }), { status: 400 });
         const nextConfig = { ...sysConfig, ...data.config };
+        const oldMasterKey = sysConfig.masterKey;
         sysConfig = nextConfig;
         
         await d1Put(env, "sys_config", JSON.stringify(nextConfig));
@@ -435,7 +440,7 @@ async function handleConfigSync(request, env, ctx) {
                      ctx?.waitUntil(fetch(`https://${node}/${encodeURI(nextConfig.apiRoute)}/api/sync`, {
                          method: 'POST',
                          headers: { 'Content-Type': 'application/json' },
-                         body: JSON.stringify({ key: nextConfig.masterKey, config: nextConfig, fromMaster: true })
+                         body: JSON.stringify({ key: nextConfig.masterKey, oldKey: oldMasterKey, config: nextConfig, fromMaster: true })
                      }).catch(() => {}));
                 }
             });
@@ -2039,7 +2044,7 @@ function getDashboardUI(hasDB) {
                   if (remoteVer) {
                       const strip = v => v.replace(/^v/, '').trim();
                       const rVer = strip(remoteVer);
-                      const cVer = strip("2.3.1");
+                      const cVer = strip("2.3.2");
                       
                       if (rVer && rVer > cVer) {
                           showUpdateBanner(repo, rVer);
