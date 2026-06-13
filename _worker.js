@@ -5,7 +5,7 @@ import { connect } from "cloudflare:sockets";
  * Handles real-time binary streams from remote sensor nodes.
  */
 
-const CURRENT_VERSION = "2.5.0";
+const CURRENT_VERSION = "2.5.1";
 
 const getAlpha = () => String.fromCharCode(118, 108, 101, 115, 115);
 const getBeta = () => String.fromCharCode(116, 114, 111, 106, 97, 110);
@@ -4175,6 +4175,31 @@ function getDashboardUI(hasDB) {
           };
 
           const CHANGELOG_DATA = {
+              "2.5.1": {
+                  headline: { en: "Telegram Bot Management & REST API", fa: "مدیریت ربات تلگرام و API جدید" },
+                  added: [
+                      { en: "Full user management via Telegram bot (create, edit, delete, search, disable, re-enable)", fa: "مدیریت کامل کاربران از طریق ربات تلگرام (ایجاد، ویرایش، حذف، جستجو، غیرفعال‌سازی، فعال‌سازی مجدد)" },
+                      { en: "Secure access control using Authorized Telegram Admin ID — only your Telegram account can manage the panel", fa: "کنترل دسترسی امن با شناسه مدیر تلگرام — فقط حساب تلگرام شما می‌تواند پنل را مدیریت کند" },
+                      { en: "HTTP REST API for all user operations at /api/users (GET, POST, PUT, DELETE)", fa: "API جدید REST برای تمام عملیات کاربران در /api/users" },
+                      { en: "Statistics API at /api/stats with user counts, traffic totals, and system status", fa: "API آمار در /api/stats با تعداد کاربران، مجموع ترافیک و وضعیت سیستم" },
+                      { en: "Bot dashboard with active, paused, expired, and auto-disabled user counts", fa: "داشبورد ربات با تعداد کاربران فعال، متوقف، منقضی و غیرفعال خودکار" },
+                      { en: "Search users by name, UUID, or subscription link directly in Telegram", fa: "جستجوی کاربران بر اساس نام، UUID یا لینک اشتراک مستقیماً در تلگرام" },
+                      { en: "Reset user traffic and extend expiration dates from the bot", fa: "بازنشانی ترافیک و تمدید تاریخ انقضا کاربران از طریق ربات" },
+                      { en: "User notes and device limit management via bot", fa: "مدیریت یادداشت‌ها و محدودیت دستگاه کاربران از طریق ربات" },
+                      { en: "Disabled users list with one-tap re-enable", fa: "لیست کاربران غیرفعال با فعال‌سازی یک‌لمسی" },
+                      { en: "Panel info command showing host, API route, mode, and version", fa: "دستور اطلاعات پنل شامل هاست، مسیر API، حالت و نسخه" },
+                  ],
+                  fixed: [],
+                  improved: [
+                      { en: "Telegram bot main menu redesigned with inline keyboard layout for mobile-first management", fa: "منوی اصلی ربات تلگرام با طرح‌بندی کیبورد درون‌خطی برای مدیریت موبایل‌محور بازطراحی شد" },
+                      { en: "User detail view now shows traffic in GB, days remaining, device limit, and notes", fa: "نمای جزئیات کاربر اکنون ترافیک به گیگابایت، روزهای باقی‌مانده، محدودیت دستگاه و یادداشت‌ها را نمایش می‌دهد" },
+                      { en: "Telegram notifications now use Admin ID for targeted delivery", fa: "اعلان‌های تلگرام اکنون از شناسه مدیر برای تحویل هدفمند استفاده می‌کنند" },
+                  ],
+                  notes: [
+                      { en: "Set the new 'Authorized Telegram Admin ID' field in System settings to secure your bot", fa: "فیلد جدید 'شناسه مدیر تلگرام' را در تنظیمات سیستم برای ایمن‌سازی ربات خود تنظیم کنید" },
+                      { en: "API endpoints are authenticated via Master Key (Bearer token or ?key= parameter)", fa: "نقاط پایانی API از طریق کلید اصلی احراز هویت می‌شوند (توکن Bearer یا پارامتر ?key=)" },
+                  ]
+              },
               "2.5.0": {
                   headline: { en: "User Auto-Disable & Management Improvements", fa: "غیرفعال‌سازی خودکار کاربر و بهبود مدیریت" },
                   added: [
